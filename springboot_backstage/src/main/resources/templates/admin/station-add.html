@@ -1,0 +1,140 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4"
+	  xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8" />
+<meta name="renderer" content="webkit|ie-comp|ie-stand" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+<link rel="Bookmark" th:href="@{/favicon.ico}" />
+<link rel="Shortcut Icon" th:href="@{/favicon.ico}" />
+<link rel="stylesheet" type="text/css" th:href="@{/h-ui/css/H-ui.min.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/h-ui.admin/css/H-ui.admin.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/h-ui.admin/skin/default/skin.css}" id="skin" />
+<link rel="stylesheet" type="text/css" th:href="@{/h-ui.admin/css/style.css}" />
+
+<title>添加用户 - H-ui.admin v3.0</title>
+</head>
+<body>
+<article class="page-container">
+	<form action="" method="post" class="form form-horizontal" id="form-station-add">
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>站点名称：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" value="" placeholder="" id="station" name="station" />
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>站点名拼音首字母缩写：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" value="" placeholder="" id="shortCode" name="shortCode"/>
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>站点名拼音全名：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" value="" placeholder="" id="fullCode" name="fullCode"/>
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>站点所属省份：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" value="" placeholder="" id="province" name="province"/>
+			</div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>省份拼音全拼，首字母大写：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" value="" placeholder="" id="proPinyin" name="proPinyin"/>
+			</div>
+		</div>
+		<div class="row cl">
+			<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+				<input class="btn btn-primary radius" id="submitBtn" type="button" value="&nbsp;&nbsp;提交&nbsp;&nbsp;" />
+			</div>
+		</div>
+		<input type="hidden" name="${_csrf.parameterName}"
+			   value="${_csrf.token}"/>
+	</form>
+</article>
+
+<!--_footer 作为公共模版分离出去-->
+<script type="text/javascript" th:src="@{/lib/jquery/1.9.1/jquery.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/layer/2.4/layer.js}"></script>
+<script type="text/javascript" th:src="@{/h-ui/js/H-ui.min.js}"></script>
+<script type="text/javascript" th:src="@{/h-ui.admin/js/H-ui.admin.js}"></script> <!--/_footer 作为公共模版分离出去-->
+
+<!--请在下方写此页面业务相关的脚本--> 
+<script type="text/javascript" th:src="@{/lib/My97DatePicker/4.8/WdatePicker.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/jquery.validate.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/validate-methods.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery.validation/1.14.0/messages_zh.js}"></script>
+<script type="text/javascript">
+    $(function(){
+        $("#form-station-add").validate({
+            rules:{
+                station:{
+                    required:true,
+                    minlength:2,
+                    maxlength:16
+                },
+                shortCode:{
+                    required:true
+                },
+                fullCode:{
+                    required:true
+                },
+                province:{
+                    required:true
+                },
+                proPinyin:{
+                    required:true
+                },
+
+            },
+            onkeyup:false,
+            focusCleanup:true,
+            success:"valid"
+        });
+    });
+
+
+    $('#submitBtn').click(function () {
+        var header = $("meta[name='_csrf_header']").attr("content");
+        var token = $("meta[name='_csrf']").attr("content");
+        console.log(header+","+token);
+        if (!$("#form-station-add").valid()) {
+            return;
+        }
+        $.ajax({
+            type: 'POST',
+            async: false,
+            url: '/admin/addStation',
+            data: {
+                id:"",
+				station:$('#station').val().trim(),
+				shortCode:$('#shortCode').val().trim(),
+				fullCode:$('#fullCode').val().trim(),
+				province:$('#province').val().trim(),
+                proPinyin:$('#proPinyin').val().trim()
+            },
+            beforeSend: function(xhr){
+                xhr.setRequestHeader(header, token);
+            },
+            success:function (data) {
+                console.log(data+","+data.success);
+                if(data.success==true){
+                    self.location='/admin/getPage/success';
+                }
+            }
+            });
+    });
+</script> 
+<!--/请在上方写此页面业务相关的脚本-->
+</body>
+</html>

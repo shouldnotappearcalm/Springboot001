@@ -1,0 +1,85 @@
+﻿<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4"
+      xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="renderer" content="webkit|ie-comp|ie-stand"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <link th:href="@{/h-ui/css/H-ui.min.css}" rel="stylesheet" type="text/css"/>
+    <link th:href="@{/h-ui.admin/css/H-ui.login.css}" rel="stylesheet" type="text/css"/>
+    <link th:href="@{/h-ui.admin/css/style.css}" rel="stylesheet" type="text/css"/>
+    <link th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}" rel="stylesheet" type="text/css"/>
+    <link th:href="@{/bootstrap-3.3.7-dist/css/bootstrap.min.css}" rel="stylesheet" type="text/css"/>
+    <link th:href="@{/bootstrap-3.3.7-dist/css/bootstrapValidator.min.css}" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" th:src="@{/lib/jquery/1.9.1/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/bootstrap-3.3.7-dist/js/bootstrap.min.js}"></script>
+    <script type="text/javascript" th:src="@{/bootstrap-3.3.7-dist/js/bootstrapValidator.min.js}"></script>
+    <script type="text/javascript" th:src="@{/bootstrap-3.3.7-dist/js/loginCheck.js}"></script>
+    <script type="text/javascript" th:src="@{/bootstrap-3.3.7-dist/js/login.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/layer/2.4/layer.js}"></script>
+    <title>后台登录 - H-ui.admin v3.0</title>
+</head>
+<body>
+<div class="header"></div>
+<div class="loginWraper">
+    <div id="loginform" class="loginBox">
+        <form class="form form-horizontal" th:name="myform" id="adminForm" th:action="@{/login}" method="post">
+            <div class="row cl">
+                <label class="form-label col-xs-3"><i class="Hui-iconfont">&#xe60d;</i></label>
+                <div class="formControls col-xs-8">
+                    <input id="" th:value="${#httpSession.getAttribute('username')}" name="username" type="text"
+                           placeholder="账户" class="input-text size-L"/>
+                </div>
+                <input type="hidden" th:value="${#httpServletRequest.getParameter('failed')}" id="failedInput" />
+            </div>
+            <div class="row cl">
+                <label class="form-label col-xs-3"><i class="Hui-iconfont">&#xe60e;</i></label>
+                <div class="formControls col-xs-8">
+                    <input name="password" type="password" placeholder="密码" class="input-text size-L"/>
+                </div>
+            </div>
+            <div class="row cl">
+                <div class="formControls col-xs-8 col-xs-offset-3">
+                    <input class="input-text size-L" id="imgCode" name="imgCode" type="text" placeholder="验证码"
+                           onblur="if(this.value==''){this.value='验证码:'}"
+                           onclick="if(this.value=='验证码:'){this.value='';}" value="验证码:" style="width:150px;"/>
+                    <img id="codeImg" src="/common/imgCode" onclick="changeImg()"/> <a id="kanbuq"
+                                                                                              href="javascript:changeImg();">看不清，换一张</a>
+                </div>
+            </div>
+            <div class="row cl">
+                <div class="formControls col-xs-8 col-xs-offset-3">
+                    <label for="online">
+                        <input type="checkbox" name="online" id="online" value=""/>
+                        使我保持登录状态</label>
+                </div>
+            </div>
+            <div class="row cl">
+                <div class="formControls col-xs-8 col-xs-offset-3">
+                    <input  type="button" onclick="submitFun()" class="btn btn-success radius size-L"
+                           value="&nbsp;登&nbsp;&nbsp;&nbsp;&nbsp;录&nbsp;"/>
+                    <input  type="reset" class="btn btn-default radius size-L"
+                           value="&nbsp;取&nbsp;&nbsp;&nbsp;&nbsp;消&nbsp;"/>
+                </div>
+            </div>
+            <input type="hidden" name="${_csrf.parameterName}"
+                   value="${_csrf.token}"/>
+        </form>
+    </div>
+</div>
+<div class="footer">Copyright 你的公司名称 by H-ui.admin v3.0</div>
+<script type="text/javascript">
+    var str=$('#failedInput').val();
+    if(str=='true'){
+        layer.open({
+            title: "错误提示",
+            content:"用户名或者密码错误"
+        });
+    }
+</script>
+</body>
+</html>

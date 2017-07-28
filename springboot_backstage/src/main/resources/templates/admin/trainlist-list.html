@@ -1,0 +1,164 @@
+﻿<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4"
+      xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="renderer" content="webkit|ie-comp|ie-stand"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/h-ui/css/H-ui.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/h-ui.admin/css/H-ui.admin.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/h-ui.admin/skin/default/skin.css}" id="skin"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/h-ui.admin/css/style.css}"/>
+    <title>车站管理</title>
+</head>
+<body>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 车站管理 <span
+        class="c-gray en">&gt;</span> 车站管理 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px"
+                                              href="javascript:location.replace(location.href);" title="刷新"><i
+        class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="page-container">
+    <div class="cl pd-5 bg-1 bk-gray mt-20"><span class="l"><!--<a href="javascript:;" onclick="datadel()" class="btn btn-danger radius"><i class="Hui-iconfont">&#xe6e2;</i> 批量删除</a> --><a
+            href="javascript:;" onclick="member_add('添加站点','/admin/getPage/station-add','','510')"
+            class="btn btn-success radius"><i class="Hui-iconfont">&#xe600;</i> 添加站点</a></span> <span
+            class="r">共有数据：<strong id="allCount">88</strong> 条</span></div>
+    <div class="cl pd-5 bg-1 bk-gray mt-20"><span class="l"><select id="selectSize" style="width:79px;height: 30px;"><option
+            th:value="10">10</option><option th:value="15">15</option><option
+            th:value="20">20</option></select></span><span class="r"><input type="text" placeholder="请输入关键词"
+                                                                            class="input-text ac_input"
+                                                                            name="search_text" value="" id="search_text"
+                                                                            autocomplete="off" style="width:300px"/><button
+            type="button" class="btn btn-default" id="search_button">搜索</button></span></div>
+    <div class="mt-20">
+        <table class="table table-border table-bordered table-hover table-bg table-sort" id="tableDemo">
+            <thead>
+            <tr class="text-c">
+                <th width="25"><input type="checkbox" name="" value=""/></th>
+                <th width="80">ID</th>
+                <th width="100">列车类型</th>
+                <th width="40">起点站</th>
+                <th width="90">终点站</th>
+                <th width="140">运行时间,即历时</th>
+                <th width="50">运行里程(KM)</th>
+                <th width="100">操作</th>
+            </tr>
+            </thead>
+            <tbody id="tabPros">
+
+            </tbody>
+        </table>
+    </div>
+    <div class="mt-20 col-md-12 col-md-offset-4" id="pageDemo"></div>
+</div>
+<!--_footer 作为公共模版分离出去-->
+<script type="text/javascript" th:src="@{/lib/jquery/1.9.1/jquery.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/layer/2.4/layer.js}"></script>
+<script type="text/javascript" th:src="@{/h-ui/js/H-ui.min.js}"></script>
+<script type="text/javascript" th:src="@{/h-ui.admin/js/H-ui.admin.js}"></script> <!--/_footer 作为公共模版分离出去-->
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript" th:src="@{/lib/My97DatePicker/4.8/WdatePicker.js}"></script>
+<script type="text/javascript" th:src="@{/lib/datatables/1.10.0/jquery.dataTables.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/laypage/1.2/laypage.js}"></script>
+<script type="text/javascript" th:src="@{/bootstrap-3.3.7-dist/js/trainlist.js}"></script>
+<script type="text/javascript">
+    var pageSize = 10;//每页显示条数
+    $(document).ready(function () {
+
+        $('#tableDemo').DataTable({
+            paging: false,
+            info: false,
+            searching: false
+        });
+        $('#selectSize').before("<span>每页显示条数:</span>");
+        $('#selectSize').change(function () {
+            pageSize = $('#selectSize').val();
+            GetList();
+        });
+        $('#search_button').click(function () {
+            GetList();
+        });
+        GetList();
+    });
+
+    function GetList(curr) {
+        console.log("GetList func");
+        curr = null == curr || '' == curr || undefined == curr ? 1 : curr;
+        var keyText = $('#search_text').val().trim();
+        keyText = null == keyText || '' == keyText ? "%%" : "%" + keyText + "%";
+        $.ajax({
+            type: 'GET',
+            async: false,
+            url: '/admin/selectTrainListLimit/' + curr + '/' + pageSize,
+            data: {
+                keyText: keyText
+            },
+            contentType: 'application/json;charset=utf-8',
+            success: function (data) {
+                var totalPages = data.totalPages;
+                var totalElements = data.totalElements;
+                $('#allCount').text(totalElements);
+                //显示分页
+                laypage({
+                    cont: 'pageDemo', //容器。值支持id名、原生dom对象，jquery对象。【如该容器为】：<div id="page1"></div>
+                    pages: totalPages, //通过后台拿到的总页数
+                    curr: curr || 1, //当前页
+                    first: '首页',
+                    last: '尾页',
+                    prev: '上一页',
+                    next: '下一页',
+                    skip: true,
+                    skin: '#039BE5',
+                    groups: 3,
+                    jump: function (obj, first) { //触发分页后的回调
+                        if (!first) { //点击跳页触发函数自身，并传递当前页：obj.curr
+                            GetList(obj.curr);
+                        }
+                    }
+                });
+                //$("#tableDemo").dataTable().fnDestroy();
+                $('#tabPros').html(PackageData(data.content));
+            }
+
+        });
+    }
+
+    $(function () {
+        /*$('.table-sort').dataTable({
+         "aaSorting": [[ 1, "asc" ]],//默认第几个排序
+         "bStateSave": true,//状态保存
+         "aoColumnDefs": [
+         //{"bVisible": false, "aTargets": [ 3 ]} //控制列的隐藏显示
+         {"orderable":false,"aTargets":[0]}// 制定列不参与排序
+         ]
+         });*/
+
+    });
+
+    /*用户-添加 member_add('添加用户','member-add.html','','510')*/
+    function member_add(title, url, w, h) {
+        layer_show(title, url, w, h);
+    }
+    /*用户-查看*/
+    function member_show(title, url, id, w, h) {
+        layer_show(title, url, w, h);
+    }
+    /*用户-编辑*/
+    function member_edit(title, url, id, w, h) {
+        console.log("edit");
+        layer_show(title, url, w, h);
+    }
+    /*密码-修改*/
+    function change_password(title, url, id, w, h) {
+        layer_show(title, url, w, h);
+    }
+
+</script>
+</body>
+</html>
