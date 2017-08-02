@@ -52,13 +52,13 @@ public class AdminController {
 
     @RequestMapping(value = "admin/article-list")
     public String article(){
-        logger.info("请求admin/article_list");
+        logger.info("请求admin/article_list122");
         return "admin/article-list";
     }
 
     @RequestMapping(value = "admin/station")
     public String station(){
-        logger.info("请求station管理请求");
+        logger.info("请求station管理请求11");
         return "admin/station-list";
     }
 
